@@ -1,6 +1,9 @@
 ﻿using System;
 using Android.App;
+using Android.Content;
 using Android.Graphics;
+using Android.Runtime;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 
@@ -54,6 +57,34 @@ namespace Toasts
                     throw new ArgumentOutOfRangeException("type");
             }
 
+            IWindowManager windowManager = Application.Context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
+            Display display = windowManager.DefaultDisplay;
+            var met = new DisplayMetrics();
+            display.GetMetrics(met);
+            var metrics = new Android.Util.DisplayMetrics();
+            windowManager.DefaultDisplay.GetMetrics(metrics);
+            int myHeight = 0;
+
+            switch (metrics.DensityDpi)
+            {
+                case DisplayMetrics.DensityHigh:
+                    Log.Debug("display", "high");
+                    myHeight = met.HeightPixels - 48;
+                    break;
+                case DisplayMetrics.DensityMedium:
+                    Log.Debug("display", "medium/default");
+                    myHeight = met.HeightPixels - 32;
+                    break;
+                case DisplayMetrics.DensityLow:
+                    Log.Debug("display", "low");
+                    myHeight = met.HeightPixels - 24;
+                    break;
+                default:
+                    Log.Debug("display", "Unknown density");
+                    break;
+            }
+            int sizeInPixels = Convert.ToInt32(Math.Ceiling(myHeight * metrics.Density));
+            view.SetY(sizeInPixels);
             return view;
         }
     }
